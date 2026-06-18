@@ -927,9 +927,13 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => {
+                            let pmInstructions = paymentMethods.find(pm => pm.id === order.payment_method || pm.name === order.payment_method)?.instructions;
+                            if (!pmInstructions) {
+                              pmInstructions = "No specific instructions available for this payment method. Please proceed with standard payment procedures.";
+                            }
                             const currentInstructions = editingOrdersInstructions[order.id] !== undefined
                               ? editingOrdersInstructions[order.id]
-                              : (order.payment_instructions || paymentMethods.find(pm => pm.id === order.payment_method || pm.name === order.payment_method)?.instructions || "");
+                              : (order.payment_instructions || pmInstructions);
                             
                             const currentMethod = editingPaymentMethods[order.id] !== undefined ? editingPaymentMethods[order.id] : order.payment_method;
                             const currentDeadline = editingPaymentDeadlines[order.id] !== undefined ? editingPaymentDeadlines[order.id] : (order.payment_deadline || '');
@@ -944,9 +948,13 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => {
+                            let pmInstructions = paymentMethods.find(pm => pm.id === order.payment_method || pm.name === order.payment_method)?.instructions;
+                            if (!pmInstructions) {
+                              pmInstructions = "No specific instructions available for this payment method. Please proceed with standard payment procedures.";
+                            }
                             const currentInstructions = editingOrdersInstructions[order.id] !== undefined
                               ? editingOrdersInstructions[order.id]
-                              : (order.payment_instructions || paymentMethods.find(pm => pm.id === order.payment_method || pm.name === order.payment_method)?.instructions || "");
+                              : (order.payment_instructions || pmInstructions);
                             
                             const currentSubject = editingSubjects[order.id] !== undefined
                               ? editingSubjects[order.id]

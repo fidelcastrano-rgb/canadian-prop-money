@@ -154,8 +154,12 @@ export async function POST(req: NextRequest) {
     if (action === 'send_payment_instructions') {
       const { paymentInstructions, subject: customSubject, paymentMethod, paymentDeadline } = body;
       
+      console.log("=== SEND PAYMENT DETAILS REQUEST ===");
+      console.log("orderId:", orderId, "type:", typeof orderId);
+
       if (!paymentInstructions || paymentInstructions.trim() === '') {
-        return NextResponse.json({ error: "Payment instructions empty." }, { status: 400 });
+        console.error("Payment instructions empty string");
+        return NextResponse.json({ error: "PAYMENT_INSTRUCTIONS_EMPTY", message: "Payment instructions cannot be empty." }, { status: 400 });
       }
 
       // 1. Save latest payment instructions, custom payment method and optional deadline to DB
@@ -172,19 +176,25 @@ export async function POST(req: NextRequest) {
       
       // Load order, customer and item details
       const order = await db.prepare("SELECT * FROM orders WHERE id = ?").bind(orderId).first<any>();
+      console.log("order result:", order);
+
       if (!order) {
-        return NextResponse.json({ error: "Order not found" }, { status: 404 });
+        return NextResponse.json({ error: "ORDER_LOOKUP_FAILED", message: "Order not found for the given ID." }, { status: 404 });
       }
+
       const customer = await db.prepare("SELECT * FROM customers WHERE id = ?").bind(order.customer_id).first<any>();
+      console.log("customer result:", customer);
+
       if (!customer) {
-        return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+        return NextResponse.json({ error: "CUSTOMER_LOOKUP_FAILED", message: "Customer not found for the given order." }, { status: 404 });
       }
 
       // Customer email validation
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!customer.email || !emailPattern.test(customer.email.trim())) {
-        return NextResponse.json({ error: "No customer email found for this order." }, { status: 400 });
+        return NextResponse.json({ error: "EMAIL_VALIDATION_FAILED", message: "No valid customer email found for this order." }, { status: 400 });
       }
+
 
       const items = await db.prepare("SELECT * FROM order_items WHERE order_id = ?").bind(orderId).all<any>();
       const itemsList = items.results || [];
@@ -465,6 +475,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid layout request actions key" }, { status: 400 });
   } catch (err: any) {
     console.error("POST admin orders error:", err);
-    return NextResponse.json({ error: "Administrative order override action failed" }, { status: 505 });
+    return NextResponse.json({ error: "ACTION_FAILED", message: err.message || "Administrative order override action failed" }, { status: 500 });
   }
 }
