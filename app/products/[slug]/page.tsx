@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    image: `https://canadianpropmoney.org${product.image || '/images/hero1.png'}`,
+    image: `https://canadianpropmoney.org${product.image || '/hero1.png'}`,
     description: product.description,
     sku: `CPM-${product.id.toUpperCase()}`,
     brand: {
@@ -99,7 +99,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                {relatedProducts.map(rp => (
                   <Link key={rp.id} href={`/products/${rp.id}`} className="block group">
                     <div className="relative aspect-[4/3] overflow-hidden mb-4 bg-black/40 border border-white/10">
-                      <Image src={rp.image || "/images/hero1.png"} alt={rp.name} fill className="object-cover group-hover:scale-105 transition duration-500" referrerPolicy="no-referrer" />
+                      <Image src={rp.image || "/hero1.png"} alt={rp.name} fill className="object-cover group-hover:scale-105 transition duration-500" referrerPolicy="no-referrer" />
                     </div>
                     <h3 className="font-bold text-lg text-white mb-1 line-clamp-1 group-hover:text-primary transition">{rp.name}</h3>
                     <p className="text-gray-400 font-mono mb-2">From ${rp.variants[0].price}</p>
