@@ -232,7 +232,7 @@ export async function POST(req: NextRequest) {
               <span style="font-size: 10px; background-color: #FFF2EB; color: #FF6B1A; padding: 4px 10px; border-radius: 4px; display: inline-block; font-weight: bold; border: 1px solid #FFE4D6; text-transform: uppercase; letter-spacing: 1px;">
                 Secure Deposit Destination
               </span>
-              <h2 style="font-size: 20px; font-weight: 950; color: #0A0A0B; margin: 8px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px;">HOW TO PAY</h2>
+              <h2 style="font-size: 20px; font-weight: 950; color: #0A0A0B; margin: 8px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px;">ADMIN PAYMENT INSTRUCTIONS</h2>
             </div>
             
             <div style="background-color: #F8F9FA; border: 1px solid #E5E7EB; border-radius: 8px; padding: 18px; margin: 0 0 15px 0; box-sizing: border-box; width: 100%; overflow-x: auto;">
@@ -320,12 +320,19 @@ export async function POST(req: NextRequest) {
       // Retrieve current email_history array from orders table and append
       const freshOrder = await db.prepare("SELECT * FROM orders WHERE id = ?").bind(orderId).first<any>();
       const currentHistory = freshOrder?.email_history ? JSON.parse(freshOrder.email_history) : [];
+      
+      // Calculate dynamic payment instructions version
+      const paymentSendsCount = currentHistory.filter((h: any) => h.subject.toLowerCase().includes("payment") || h.payment_instructions_version).length;
+      const versionCounter = paymentSendsCount + 1;
+
       currentHistory.push({
         created_at: timestamp,
         subject: finalSubject,
         recipient: customer.email,
         payment_method: order.payment_method,
-        status: sendRes.status
+        status: sendRes.status,
+        payment_instructions_version: versionCounter,
+        payment_instructions: paymentInstructions || "No explicit instructions provided."
       });
 
       const updatedHistoryStr = JSON.stringify(currentHistory);

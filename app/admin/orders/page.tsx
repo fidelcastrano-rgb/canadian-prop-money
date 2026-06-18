@@ -86,7 +86,13 @@ export default function AdminDashboardPage() {
   const [refreshCount, setRefreshCount] = useState(0);
 
   // Authentication states
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => {
+    if (typeof window !== 'undefined') {
+      const savedToken = sessionStorage.getItem('cpm_admin_passcode');
+      if (!savedToken) return false;
+    }
+    return null;
+  });
   const [typedCode, setTypedCode] = useState('');
   const [checkingAuth, setCheckingAuth] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -114,7 +120,9 @@ export default function AdminDashboardPage() {
       };
       checkToken();
     } else {
-      setIsAuthenticated(false);
+      setTimeout(() => {
+        setIsAuthenticated(false);
+      }, 0);
     }
   }, []);
 
@@ -978,20 +986,38 @@ export default function AdminDashboardPage() {
                             }
 
                             return parsedHistory.map((item: any, idx: number) => (
-                              <div key={idx} className="flex justify-between items-start text-[9px] font-mono bg-black/60 p-2 rounded border border-white/5 gap-2">
-                                <div className="space-y-0.5 truncate flex-1">
-                                  <span className="text-gray-400 block truncate font-bold uppercase">{item.subject}</span>
-                                  <span className="text-gray-500 block truncate">to: {item.recipient}</span>
-                                  {item.payment_method && (
-                                    <span className="text-amber-500 block text-[8px] uppercase font-bold">Method: {item.payment_method}</span>
-                                  )}
-                                  <span className="text-[8px] text-gray-600 block">{new Date(item.created_at).toLocaleString()}</span>
+                              <div key={idx} className="flex flex-col text-[9px] font-mono bg-black/60 p-2 rounded border border-white/5 gap-1.5">
+                                <div className="flex justify-between items-start gap-2">
+                                  <div className="space-y-0.5 truncate flex-1">
+                                    <span className="text-gray-400 block truncate font-bold uppercase">{item.subject}</span>
+                                    <span className="text-gray-500 block truncate">to: {item.recipient}</span>
+                                    {item.payment_method && (
+                                      <span className="text-amber-500 block text-[8px] uppercase font-bold">Method: {item.payment_method}</span>
+                                    )}
+                                    {item.payment_instructions_version && (
+                                      <span className="text-teal-400 block text-[8px] uppercase font-bold">Version: V{item.payment_instructions_version}</span>
+                                    )}
+                                    <span className="text-[8px] text-gray-600 block">{new Date(item.created_at).toLocaleString()}</span>
+                                  </div>
+                                  <span className={`px-1 rounded uppercase font-bold text-[8px] shrink-0 ${
+                                    item.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                                  }`}>
+                                    {item.status}
+                                  </span>
                                 </div>
-                                <span className={`px-1 rounded uppercase font-bold text-[8px] shrink-0 ${
-                                  item.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                                }`}>
-                                  {item.status}
-                                </span>
+                                
+                                {item.payment_instructions && (
+                                  <details className="mt-0.5 group border-t border-white/5 pt-1">
+                                    <summary className="text-[8px] text-primary hover:underline cursor-pointer select-none outline-none list-none flex items-center justify-between">
+                                      <span>[Click to Review Sent Instructions]</span>
+                                      <span className="text-[7px] text-gray-500 group-open:hidden">▼</span>
+                                      <span className="text-[7px] text-gray-500 hidden group-open:block">▲</span>
+                                    </summary>
+                                    <pre className="mt-1 bg-black/80 border border-white/5 p-1.5 rounded text-[8px] max-h-[100px] overflow-auto whitespace-pre-wrap font-mono text-gray-300">
+                                      {item.payment_instructions}
+                                    </pre>
+                                  </details>
+                                )}
                               </div>
                             ));
                           })()}

@@ -17,40 +17,8 @@ const SHIPPING_OPTIONS = [
   { id: 'international', name: 'International shipping (5-7 days)', price: 80 }
 ];
 
-interface PaymentOption {
-  id: string;
-  name: string;
-  isCrypto?: boolean;
-  note?: string;
-}
+import { COUNTRY_PAYMENTS, type PaymentOption } from '@/lib/payment-methods';
 
-const COUNTRY_PAYMENTS: Record<string, PaymentOption[]> = {
-  "Canada": [
-    { id: "e_transfer", name: "E-Transfer" },
-    { id: "crypto", name: "Crypto Currency (Bitcoin, USDT, Ethereum)", isCrypto: true, note: "Crypto currency is the preferred payment option for those who wants to be anonymous." }
-  ],
-  "United States": [
-    { id: "crypto", name: "Crypto Currency", isCrypto: true, note: "Crypto currency is the preferred payment option for those who wants to be anonymous." },
-    { id: "apple_cash", name: "Apple Cash" },
-    { id: "chime_pay", name: "Chime pay" },
-    { id: "zelle", name: "Zelle" }
-  ],
-  "United Kingdom": [
-    { id: "crypto", name: "Crypto Currency", isCrypto: true, note: "Crypto currency is the preferred payment option for those who wants to be anonymous." },
-    { id: "bank_transfer", name: "Bank Transfer" },
-    { id: "credit_card", name: "Credit Card (Master Card only)" }
-  ],
-  "European Union": [
-    { id: "crypto", name: "Crypto Currency", isCrypto: true, note: "Crypto currency is the preferred payment option for those who wants to be anonymous." },
-    { id: "credit_card", name: "Credit Card (Master Card only)" },
-    { id: "paypal", name: "PayPal (Friends and Family only)" }
-  ],
-  "Australia": [
-    { id: "crypto", name: "Crypto Currency", isCrypto: true, note: "Crypto currency is the preferred payment option for those who wants to be anonymous." },
-    { id: "bank_transfer_payid", name: "Bank Transfer (PayID)" },
-    { id: "credit_card", name: "Credit Card (Master Card only)" }
-  ]
-};
 
 const renderPaymentIcon = (id: string, className = "w-5 h-5 text-primary shrink-0") => {
   switch (id) {
